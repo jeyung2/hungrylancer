@@ -1,4 +1,4 @@
-import logo from "./logo.svg";
+//import logo from "./logo.svg";
 import "./App.css";
 import CustomerTable from "./components/CustomerTable";
 import {
@@ -10,6 +10,7 @@ import {
   Paper,
 } from "@material-ui/core/";
 import { withStyles, styled } from "@material-ui/core/styles";
+import { Component } from "react";
 
 // Styled 컴포넌트 정의
 const StyledPaper = styled(Paper)({
@@ -25,7 +26,7 @@ const StyledTable = styled(Table)({
 const styles = (theme) => ({
   root: {
     width: "100%",
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing(3), //theme.spacing.unit * 3,
     overflow: "auto",
   },
   table: {
@@ -33,65 +34,58 @@ const styles = (theme) => ({
   },
 });
 
-const customers = [
-  {
-    id: 1,
-    image: "https://picsum.photos/200/300?random=1",
-    name: "홍길동",
-    birthday: "123456",
-    gender: "남자",
-    job: "대학생",
-  },
-  {
-    id: 2,
-    image: "https://picsum.photos/200/300?random=2",
-    name: "박제영",
-    birthday: "711123",
-    gender: "남자",
-    job: "프리랜서",
-  },
-  {
-    id: 3,
-    image: "https://picsum.photos/200/300?random=3",
-    name: "박현지",
-    birthday: "111221",
-    gender: "여자",
-    job: "중학생",
-  },
-];
+class App extends Component {
+  state = {
+    customers: "",
+  };
 
-function App() {
-  return (
-    <StyledPaper>
-      <StyledTable>
-        <TableHead>
-          <TableRow>
-            <TableCell>번호</TableCell>
-            <TableCell>이름</TableCell>
-            <TableCell>이미지</TableCell>
-            <TableCell>생일</TableCell>
-            <TableCell>성별</TableCell>
-            <TableCell>직업</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {customers.map((customer) => {
-            return (
-              <CustomerTable
-                key={customer.id}
-                id={customer.id}
-                name={customer.name}
-                image={customer.image}
-                birthday={customer.birthday}
-                gender={customer.gender}
-                job={customer.job}
-              />
-            );
-          })}
-        </TableBody>
-      </StyledTable>
-    </StyledPaper>
-  );
+  componentDidMount() {
+    this.callApi()
+      .then((res) => this.setState({ customers: res }))
+      .catch((err) => console.log(err));
+  }
+
+  callApi = async () => {
+    const response = await fetch("api/customers");
+    const body = await response.json();
+    return body;
+  };
+
+  render() {
+    //const { classes } = this.props;
+    return (
+      <StyledPaper>
+        <StyledTable>
+          <TableHead>
+            <TableRow>
+              <TableCell>번호</TableCell>
+              <TableCell>이름</TableCell>
+              <TableCell>이미지</TableCell>
+              <TableCell>생일</TableCell>
+              <TableCell>성별</TableCell>
+              <TableCell>직업</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {this.state.customers
+              ? this.state.customers.map((customer) => {
+                  return (
+                    <CustomerTable
+                      key={customer.id}
+                      id={customer.id}
+                      name={customer.name}
+                      image={customer.image}
+                      birthday={customer.birthday}
+                      gender={customer.gender}
+                      job={customer.job}
+                    />
+                  );
+                })
+              : ""}
+          </TableBody>
+        </StyledTable>
+      </StyledPaper>
+    );
+  }
 }
-
 export default withStyles(styles)(App);
